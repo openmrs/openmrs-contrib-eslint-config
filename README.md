@@ -72,6 +72,15 @@ This package follows [semantic versioning](https://semver.org/), with one projec
 
 When in doubt, prefer a slower ratchet. The goal is for upgrades to be safe to take without a red build.
 
+## Releasing
+
+Releases are published to npm by CI. To cut a release:
+
+1. Bump `version` in `package.json` on `main` (via a PR).
+2. Create a [GitHub release](https://github.com/openmrs/openmrs-contrib-eslint-config/releases/new) with a `v<version>` tag matching the new version (for example `v0.1.0`).
+
+The release workflow verifies the tag matches `package.json`, runs the smoke test, and publishes with npm provenance. There are no pre-releases; every publish is a tagged release.
+
 ## Contributing
 
 Issues and pull requests are welcome. Please open an issue to discuss any rule change before sending a PR, since rule changes affect every consuming repository.
