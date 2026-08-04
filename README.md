@@ -56,7 +56,7 @@ Each preset exports an array of flat-config objects, so spread it into your conf
 
 The `base` preset is intentionally a near-zero-diff port of `openmrs-esm-core`'s `.eslintrc`, so adopting it in an existing repo should not introduce new lint failures. To migrate:
 
-1. Bump `eslint` to `>=9` and remove the per-plugin ESLint dev dependencies that this package now provides (`@typescript-eslint/*`, `eslint-plugin-import`, `eslint-plugin-react-hooks`, `eslint-plugin-jest-dom`, `eslint-plugin-testing-library`, `eslint-plugin-playwright`, `eslint-config-prettier`).
+1. Bump `eslint` to match this package's declared peer range (currently `^9.39.0`) and remove the per-plugin ESLint dev dependencies that this package now provides (`@typescript-eslint/*`, `eslint-plugin-import`, `eslint-plugin-react-hooks`, `eslint-plugin-jest-dom`, `eslint-plugin-testing-library`, `eslint-plugin-playwright`, `eslint-config-prettier`).
 2. Delete `.eslintrc` / `.eslintignore` and add an `eslint.config.js` as shown above (flat config moves ignores into the config itself).
 3. Run `npx eslint . --fix` and confirm the diff is limited to autofixes.
 
