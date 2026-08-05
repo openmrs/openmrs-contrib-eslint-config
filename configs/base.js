@@ -8,9 +8,9 @@ import globals from 'globals';
  *
  * Ported from openmrs-esm-core's .eslintrc to be a zero-diff starting point for
  * adopting repositories. The disabled-rules block mirrors core "to keep the diff
- * small"; tighten these in later releases under the semver policy in the README
- * (a tightened rule breaks consumers' `--max-warnings 0` CI, so it is at least a
- * minor that lands the rule as `warn` first).
+ * small". Tightening any of these defaults is a breaking change under the
+ * versioning policy in the README: candidate rules ship in an opt-in preset in
+ * a minor release and are promoted into the defaults in a major.
  */
 export default tseslint.config(
   js.configs.recommended,
