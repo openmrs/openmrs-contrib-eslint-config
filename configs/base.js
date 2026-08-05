@@ -32,12 +32,6 @@ export default tseslint.config(
       '@typescript-eslint/no-empty-object-type': 'off',
       '@typescript-eslint/no-unsafe-function-type': 'off',
       '@typescript-eslint/no-wrapper-object-types': 'off',
-      // core's `no-var-requires: off` was MERGED into `no-require-imports` in v8.
-      // This is more lenient than core was in source files (core only relaxed it
-      // for *.config.js / *.cjs). Tighten by setting this to its recommended
-      // default and adding a files-scoped override for tooling/config files.
-      '@typescript-eslint/no-require-imports': 'off',
-
       // --- Enforced (verbatim from core) ---
       '@typescript-eslint/consistent-type-imports': ['error', { fixStyle: 'inline-type-imports' }],
       'import/no-duplicates': 'error',
@@ -71,6 +65,25 @@ export default tseslint.config(
           ],
         },
       ],
+    },
+  },
+  {
+    // `require()` is allowed only in the CommonJS tooling and config files below.
+    // Everywhere else, `@typescript-eslint/no-require-imports` stays at the
+    // `error` that typescript-eslint's recommended preset sets. The globs are the
+    // union of the carve-outs core and patient-chart used in their legacy configs.
+    files: [
+      '**/*.config.js',
+      '**/*-config.js',
+      '**/karma.conf.js',
+      '**/protractor.conf.js',
+      '**/tools/**/*.js',
+      '**/setup-tests.js',
+      '**/__mocks__/**/*.js',
+      '**/*.cjs',
+    ],
+    rules: {
+      '@typescript-eslint/no-require-imports': 'off',
     },
   },
 );

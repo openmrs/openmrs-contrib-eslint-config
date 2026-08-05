@@ -58,19 +58,20 @@ The `base` preset is intentionally a near-zero-diff port of `openmrs-esm-core`'s
 
 1. Bump `eslint` to match this package's declared peer range (currently `^9.39.0`) and remove the per-plugin ESLint dev dependencies that this package now provides (`@typescript-eslint/*`, `eslint-plugin-import`, `eslint-plugin-react-hooks`, `eslint-plugin-jest-dom`, `eslint-plugin-testing-library`, `eslint-plugin-playwright`, `eslint-config-prettier`).
 2. Delete `.eslintrc` / `.eslintignore` and add an `eslint.config.js` as shown above (flat config moves ignores into the config itself).
-3. Run `npx eslint . --fix` and confirm the diff is limited to autofixes.
+3. Run your repo's usual source-scoped lint task (for example `yarn turbo run lint`, or the package's `eslint src` script) and confirm it passes. If you want autofixes, run that same source-scoped command with `--fix` and review the diff. Avoid a blanket `eslint . --fix`: it lints and mutates a broader file set than your CI actually checks.
+4. Flat config lints `.js`/`.mjs`/`.cjs` files that a legacy `--ext ts,tsx` lint script skipped, so expect findings in `.js` files that were previously unlinted.
 
 A couple of intentional differences from core's legacy config are documented inline in `configs/base.js`, most importantly the [typescript-eslint v8 rule renames](https://typescript-eslint.io/blog/announcing-typescript-eslint-v8/) (`ban-types` was split into three rules; `no-var-requires` was folded into `no-require-imports`).
 
 ## Versioning policy
 
-This package follows [semantic versioning](https://semver.org/), with one project-specific rule that matters because O3 repos lint with `--max-warnings 0`:
+This package follows [semantic versioning](https://semver.org/), with one project-specific rule:
 
-- **Any change that can make a previously-passing repo fail CI is breaking.** Adding a rule, or raising a rule from `off`/`warn` to `error`, falls in this bucket.
-- New or stricter rules are introduced as `warn` in a **minor** release first, giving repos a window to clean up, and promoted to `error` in a subsequent **major**.
-- Loosening a rule, fixing a misconfiguration, or a dependency bump that does not change emitted findings is a **patch** or **minor** as appropriate.
+- **Any change that can make a previously-passing repo fail is breaking and ships in a major.** That includes adding a rule to a default preset at *any* severity: many O3 repos lint with `--max-warnings 0`, so a new `warn` fails their CI exactly like an `error` would.
+- **Minor releases** may add opt-in presets (rules a repo gets only by importing them) and lenient-direction changes (turning a rule off, relaxing rule options).
+- **Dependency bumps**: a bump that changes emitted findings is breaking; one verified not to change findings is a patch or minor.
 
-When in doubt, prefer a slower ratchet. The goal is for upgrades to be safe to take without a red build.
+The intended tightening path is: ship candidate rules in an opt-in preset in a minor, let repos adopt and clean up individually, then promote them into the default presets in a later major. When in doubt, treat a change as breaking. The goal is that any non-major upgrade is safe to take without a red build.
 
 ## Releasing
 
