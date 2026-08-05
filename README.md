@@ -45,7 +45,7 @@ The named presets don't bundle `eslint-config-prettier`, but they enable no form
 
 | Preset  | What it covers | Notable contents |
 | ------- | -------------- | ---------------- |
-| `base`  | TypeScript + import hygiene for all source files | `eslint:recommended`, `typescript-eslint/recommended`, `consistent-type-imports`, `no-console` (allows `warn`/`error`), and `no-restricted-imports` guards for `lodash` / `lodash-es` / Carbon |
+| `base`  | TypeScript + import hygiene for all source files | `eslint:recommended`, `typescript-eslint/recommended`, `consistent-type-imports`, `no-console` (allows `warn`/`error`), and `no-restricted-imports` guards for `lodash` / `lodash-es` / Carbon; `require()` is allowed only in CommonJS tooling and config files |
 | `react` | React components | `react-hooks/rules-of-hooks` |
 | `test`  | Unit/integration tests (`**/*.test.{ts,tsx}`) | `jest-dom` and `testing-library` recommended rules |
 | `e2e`   | Playwright specs (`e2e/**/*.spec.ts`) | `playwright/recommended` |
@@ -61,7 +61,7 @@ The `base` preset is intentionally a near-zero-diff port of `openmrs-esm-core`'s
 3. Run your repo's usual source-scoped lint task (for example `yarn turbo run lint`, or the package's `eslint src` script) and confirm it passes. If you want autofixes, run that same source-scoped command with `--fix` and review the diff. Avoid a blanket `eslint . --fix`: it lints and mutates a broader file set than your CI actually checks.
 4. Flat config lints `.js`/`.mjs`/`.cjs` files that a legacy `--ext ts,tsx` lint script skipped, so expect findings in `.js` files that were previously unlinted.
 
-A couple of intentional differences from core's legacy config are documented inline in `configs/base.js`, most importantly the [typescript-eslint v8 rule renames](https://typescript-eslint.io/blog/announcing-typescript-eslint-v8/) (`ban-types` was split into three rules; `no-var-requires` was folded into `no-require-imports`).
+A couple of intentional differences from core's legacy config are documented inline in `configs/base.js`, most importantly the [typescript-eslint v8 rule renames](https://typescript-eslint.io/blog/announcing-typescript-eslint-v8/) (`ban-types` was split into three rules) and the added browser globals.
 
 ## Versioning policy
 

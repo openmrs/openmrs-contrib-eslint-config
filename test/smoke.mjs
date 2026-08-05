@@ -84,8 +84,9 @@ function ruleIds(messages) {
   assert.equal(ids.length, 2, `expected two no-restricted-imports errors, got: ${JSON.stringify(messages)}`);
 }
 
-// Contract: require() is rejected in source files (TS and JS alike).
-for (const filePath of ['src/uses-require.ts', 'src/uses-require.js']) {
+// Contract: require() is rejected in source files (TS and JS alike). The
+// toolsmith path guards against the tools/ glob matching by substring.
+for (const filePath of ['src/uses-require.ts', 'src/uses-require.js', 'src/toolsmith/uses-require.js']) {
   const messages = await lint(`const fs = require('fs');\n\nfs.readFileSync('x');\n`, filePath);
   assert.ok(
     ruleIds(messages).includes('@typescript-eslint/no-require-imports'),
@@ -93,14 +94,19 @@ for (const filePath of ['src/uses-require.ts', 'src/uses-require.js']) {
   );
 }
 
-// Contract: require() is allowed in CommonJS tooling and config files.
+// Contract: require() is allowed in CommonJS tooling and config files. The
+// root-level tools/ and setup-tests.js paths pin the zero-prefix semantics of
+// the `**/` globs, which is what lets one pattern cover both root and nested
+// locations.
 for (const filePath of [
   'webpack.config.js',
   'jest.config.js',
   'i18next-parser-config.js',
   'karma.conf.js',
+  'tools/helper.js',
   'tools/i18next-parser.config.js',
   'packages/app/tools/helper.js',
+  'setup-tests.js',
   'src/setup-tests.js',
   '__mocks__/react-i18next.js',
   'scripts/build.cjs',
