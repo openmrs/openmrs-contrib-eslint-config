@@ -74,8 +74,8 @@ function ruleIds(messages) {
   );
 }
 
-// Base preset: typeof import() annotations are allowed in tests so Vitest
-// mocks do not need a duplicate namespace type import, while source stays strict.
+// Base preset: typeof import() annotations are allowed in tests and __mocks__
+// so Vitest mocks do not need a duplicate namespace type import, while source stays strict.
 {
   const baseOnly = new ESLint({ overrideConfigFile: true, overrideConfig: base });
   const baseAndTest = new ESLint({ overrideConfigFile: true, overrideConfig: [...base, ...test] });
@@ -85,11 +85,16 @@ const mockUseConfig: typeof import('@openmrs/esm-framework').useConfig = useConf
 
 void mockUseConfig;
 `;
-  const [testResult] = await baseAndTest.lintText(code, { filePath: 'src/framework.test.ts' });
-  assert.ok(
-    !ruleIds(testResult.messages).includes('@typescript-eslint/consistent-type-imports'),
-    `expected typeof import() in tests to pass, got: ${JSON.stringify(testResult.messages)}`,
-  );
+  for (const [eslint, filePath] of [
+    [baseAndTest, 'src/framework.test.ts'],
+    [baseOnly, '__mocks__/framework.ts'],
+  ]) {
+    const [result] = await eslint.lintText(code, { filePath });
+    assert.ok(
+      !ruleIds(result.messages).includes('@typescript-eslint/consistent-type-imports'),
+      `expected typeof import() in ${filePath} to pass, got: ${JSON.stringify(result.messages)}`,
+    );
+  }
 
   const [sourceResult] = await baseOnly.lintText(code, { filePath: 'src/framework.ts' });
   assert.ok(

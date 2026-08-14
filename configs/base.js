@@ -68,10 +68,10 @@ export default tseslint.config(
     },
   },
   {
-    files: ['**/*.test.{ts,tsx}'],
+    files: ['**/*.test.{ts,tsx}', '**/__mocks__/**'],
     rules: {
       // Vitest mocks often need a value import and its type from the same
-      // module. Allow `typeof import(...)` annotations in tests so
+      // module. Allow `typeof import(...)` annotations in tests and mock files so
       // `consistent-type-imports` does not force a duplicate namespace import.
       '@typescript-eslint/consistent-type-imports': [
         'error',
