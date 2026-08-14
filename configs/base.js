@@ -68,10 +68,23 @@ export default tseslint.config(
     },
   },
   {
-    // `require()` is allowed only in the CommonJS tooling and config files below.
+    files: ['**/*.test.{ts,tsx}', '**/__mocks__/**'],
+    rules: {
+      // Vitest mocks often need a value import and its type from the same
+      // module. Allow `typeof import(...)` annotations in tests and mock files so
+      // `consistent-type-imports` does not force a duplicate namespace import.
+      '@typescript-eslint/consistent-type-imports': [
+        'error',
+        { disallowTypeAnnotations: false, fixStyle: 'inline-type-imports' },
+      ],
+    },
+  },
+  {
+    // `require()` is allowed only in the CommonJS tooling, config, and mock files below.
     // Everywhere else, `@typescript-eslint/no-require-imports` stays at the
-    // `error` that typescript-eslint's recommended preset sets. The globs are the
-    // union of the carve-outs core and patient-chart used in their legacy configs.
+    // `error` that typescript-eslint's recommended preset sets. The tooling globs
+    // come from core and patient-chart; mocks cover every extension because O3
+    // repositories commonly keep TypeScript fixtures there.
     files: [
       '**/*.config.js',
       '**/*-config.js',
@@ -79,7 +92,7 @@ export default tseslint.config(
       '**/protractor.conf.js',
       '**/tools/**/*.js',
       '**/setup-tests.js',
-      '**/__mocks__/**/*.js',
+      '**/__mocks__/**',
       '**/*.cjs',
     ],
     rules: {

@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { ESLint } from 'eslint';
-import openmrs from '../index.js';
+import openmrs, { base, test } from '../index.js';
 
 /**
  * Smoke test: the composed config loads under ESLint 9 (every plugin
@@ -16,6 +16,19 @@ async function lint(code, filePath) {
 
 function ruleIds(messages) {
   return messages.map((m) => m.ruleId);
+}
+
+// Contract: named presets remain independently loadable. In particular, the
+// test preset must not refer to rules from plugins that it does not provide.
+{
+  const testOnly = new ESLint({ overrideConfigFile: true, overrideConfig: test });
+  const [result] = await testOnly.lintText(`test('loads', () => {});\n`, {
+    filePath: 'src/standalone.test.ts',
+  });
+  assert.ok(
+    !result.messages.some((message) => message.fatal),
+    `expected the test preset to load independently, got: ${JSON.stringify(result.messages)}`,
+  );
 }
 
 // Clean TypeScript passes.
@@ -58,6 +71,35 @@ function ruleIds(messages) {
   assert.ok(
     ids.some((id) => id?.startsWith('testing-library/')),
     `expected a testing-library rule, got: ${ids}`,
+  );
+}
+
+// Base preset: typeof import() annotations are allowed in tests and __mocks__
+// so Vitest mocks do not need a duplicate namespace type import, while source stays strict.
+{
+  const baseOnly = new ESLint({ overrideConfigFile: true, overrideConfig: base });
+  const baseAndTest = new ESLint({ overrideConfigFile: true, overrideConfig: [...base, ...test] });
+  const code = `import { useConfig } from '@openmrs/esm-framework';
+
+const mockUseConfig: typeof import('@openmrs/esm-framework').useConfig = useConfig;
+
+void mockUseConfig;
+`;
+  for (const [eslint, filePath] of [
+    [baseAndTest, 'src/framework.test.ts'],
+    [baseOnly, '__mocks__/framework.ts'],
+  ]) {
+    const [result] = await eslint.lintText(code, { filePath });
+    assert.ok(
+      !ruleIds(result.messages).includes('@typescript-eslint/consistent-type-imports'),
+      `expected typeof import() in ${filePath} to pass, got: ${JSON.stringify(result.messages)}`,
+    );
+  }
+
+  const [sourceResult] = await baseOnly.lintText(code, { filePath: 'src/framework.ts' });
+  assert.ok(
+    ruleIds(sourceResult.messages).includes('@typescript-eslint/consistent-type-imports'),
+    `expected consistent-type-imports outside tests, got: ${JSON.stringify(sourceResult.messages)}`,
   );
 }
 
@@ -109,6 +151,8 @@ for (const filePath of [
   'setup-tests.js',
   'src/setup-tests.js',
   '__mocks__/react-i18next.js',
+  '__mocks__/index.ts',
+  'packages/app/__mocks__/fixture.ts',
   'scripts/build.cjs',
 ]) {
   const messages = await lint(`const fs = require('fs');\n\nfs.readFileSync('x');\n`, filePath);
