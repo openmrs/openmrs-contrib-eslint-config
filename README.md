@@ -45,7 +45,7 @@ The named presets don't bundle `eslint-config-prettier`, but they enable no form
 
 | Preset  | What it covers | Notable contents |
 | ------- | -------------- | ---------------- |
-| `base`  | TypeScript + import hygiene for all source files | `eslint:recommended`, `typescript-eslint/recommended`, `consistent-type-imports`, `no-console` (allows `warn`/`error`), and `no-restricted-imports` guards for `lodash` / `lodash-es` / Carbon; `require()` is allowed only in CommonJS tooling and config files |
+| `base`  | TypeScript + import hygiene for all source files | `eslint:recommended`, `typescript-eslint/recommended`, `consistent-type-imports` (permits `typeof import(...)` annotations in tests), `no-console` (allows `warn`/`error`), and `no-restricted-imports` guards for `lodash` / `lodash-es` / Carbon; `require()` is allowed only in CommonJS tooling, config files, and `__mocks__` |
 | `react` | React components | `react-hooks/rules-of-hooks` |
 | `test`  | Unit/integration tests (`**/*.test.{ts,tsx}`) | `jest-dom` and `testing-library` recommended rules |
 | `e2e`   | Playwright specs (`e2e/**/*.spec.ts`) | `playwright/recommended` |
