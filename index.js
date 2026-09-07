@@ -5,6 +5,7 @@ import e2e from './configs/e2e.js';
 import prettier from 'eslint-config-prettier';
 
 export { base, react, test, e2e };
+export { default as modals } from './configs/modals.js';
 export { default as reactTypes } from './configs/react-types.js';
 
 /**

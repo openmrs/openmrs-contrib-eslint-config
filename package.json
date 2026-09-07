@@ -1,6 +1,6 @@
 {
   "name": "@openmrs/eslint-config",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "Standardized ESLint configuration for OpenMRS O3 frontend modules",
   "license": "MPL-2.0",
   "homepage": "https://github.com/openmrs/openmrs-contrib-eslint-config#readme",
@@ -16,7 +16,8 @@
     "./react": "./configs/react.js",
     "./test": "./configs/test.js",
     "./e2e": "./configs/e2e.js",
-    "./react-types": "./configs/react-types.js"
+    "./react-types": "./configs/react-types.js",
+    "./modals": "./configs/modals.js"
   },
   "files": [
     "index.js",
@@ -26,7 +27,7 @@
     "access": "public"
   },
   "scripts": {
-    "test": "node test/smoke.mjs && node test/react-types.mjs"
+    "test": "node test/smoke.mjs && node test/react-types.mjs && node test/modals.mjs"
   },
   "keywords": [
     "openmrs",
