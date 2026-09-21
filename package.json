@@ -15,7 +15,8 @@
     "./base": "./configs/base.js",
     "./react": "./configs/react.js",
     "./test": "./configs/test.js",
-    "./e2e": "./configs/e2e.js"
+    "./e2e": "./configs/e2e.js",
+    "./react-types": "./configs/react-types.js"
   },
   "files": [
     "index.js",
@@ -25,7 +26,7 @@
     "access": "public"
   },
   "scripts": {
-    "test": "node test/smoke.mjs"
+    "test": "node test/smoke.mjs && node test/react-types.mjs"
   },
   "keywords": [
     "openmrs",
