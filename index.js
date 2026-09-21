@@ -5,9 +5,10 @@ import e2e from './configs/e2e.js';
 import prettier from 'eslint-config-prettier';
 
 export { base, react, test, e2e };
+export { default as reactTypes } from './configs/react-types.js';
 
 /**
- * Recommended flat config: every preset composed in order, with
+ * Recommended flat config: default presets composed in order, with
  * `eslint-config-prettier` applied last to switch off rules that would
  * conflict with Prettier. Spread it directly in `eslint.config.mjs`:
  *

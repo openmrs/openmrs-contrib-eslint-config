@@ -14,7 +14,7 @@ npm install --save-dev @openmrs/eslint-config eslint typescript
 
 ## Usage
 
-Create an `eslint.config.js` (or `eslint.config.mjs`) at the root of your project and spread the default export, which composes every preset and applies `eslint-config-prettier` last for you:
+Create an `eslint.config.js` (or `eslint.config.mjs`) at the root of your project and spread the default export, which composes the default presets and applies `eslint-config-prettier` last for you:
 
 ```js
 import openmrs from '@openmrs/eslint-config';
@@ -49,8 +49,29 @@ The named presets don't bundle `eslint-config-prettier`, but they enable no form
 | `react` | React components | `react-hooks/rules-of-hooks` |
 | `test`  | Unit/integration tests (`**/*.test.{ts,tsx}`) | `jest-dom` and `testing-library` recommended rules |
 | `e2e`   | Playwright specs (`e2e/**/*.spec.ts`) | `playwright/recommended` |
+| `reactTypes` (opt-in) | React types in TypeScript files | Rejects `JSX.Element` in favor of `React.JSX.Element` |
 
 Each preset exports an array of flat-config objects, so spread it into your config.
+
+### Opt-in React type conventions
+
+Use `reactTypes` to prevent new `JSX.Element` annotations while preparing for React 19 types. `React.JSX.Element` also works with current React 18 types, so this does not require a runtime upgrade.
+
+```js
+import openmrs, { reactTypes } from '@openmrs/eslint-config';
+
+export default [
+  { ignores: ['dist/**'] },
+  ...openmrs,
+  ...reactTypes,
+];
+```
+
+The preset is also available from `@openmrs/eslint-config/react-types`. It is not included in the default export. It checks `.ts`, `.tsx`, `.mts`, and `.cts` files and only restricts the type spelling `JSX.Element`; it is not a complete React 19 migration check.
+
+There is no autofix: the rule matches the type's spelling, not the namespace it resolves to. For React types, replace `JSX.Element` with `React.JSX.Element` and add `import type React from 'react'` if needed. Review locally defined or imported JSX namespaces separately, and run type checking after making changes.
+
+If your repository already configures `@typescript-eslint/no-restricted-types`, preserve those restrictions when adding this one. ESLint replaces the rule's options rather than merging them.
 
 ## Migrating from a legacy `.eslintrc`
 
