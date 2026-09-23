@@ -2,6 +2,7 @@ import js from '@eslint/js';
 import tseslint from 'typescript-eslint';
 import importPlugin from 'eslint-plugin-import';
 import globals from 'globals';
+import importRestrictions from './import-restrictions.js';
 
 /**
  * Base preset: TypeScript + import hygiene + OpenMRS import restrictions.
@@ -41,30 +42,7 @@ export default tseslint.config(
       'no-prototype-builtins': 'off',
       'no-useless-escape': 'off',
       'prefer-const': 'off',
-      'no-restricted-imports': [
-        'error',
-        {
-          paths: [
-            {
-              name: 'lodash',
-              message: "Import specific methods from `lodash`. e.g. `import map from 'lodash/map'`",
-            },
-            {
-              name: 'lodash-es',
-              importNames: ['default'],
-              message: "Import specific methods from `lodash-es`. e.g. `import { map } from 'lodash-es'`",
-            },
-            {
-              name: 'carbon-components-react',
-              message: "Import from `@carbon/react` directly. e.g. `import { Toggle } from '@carbon/react'`",
-            },
-            {
-              name: '@carbon/icons-react',
-              message: "Import from `@carbon/react/icons`. e.g. `import { ChevronUp } from '@carbon/react/icons'`",
-            },
-          ],
-        },
-      ],
+      'no-restricted-imports': ['error', importRestrictions],
     },
   },
   {

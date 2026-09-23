@@ -50,6 +50,7 @@ The named presets don't bundle `eslint-config-prettier`, but they enable no form
 | `test`  | Unit/integration tests (`**/*.test.{ts,tsx}`) | `jest-dom` and `testing-library` recommended rules |
 | `e2e`   | Playwright specs (`e2e/**/*.spec.ts`) | `playwright/recommended` |
 | `reactTypes` (opt-in) | React types in TypeScript files | Rejects `JSX.Element` in favor of `React.JSX.Element` |
+| `modals` (opt-in) | Applications running in the O3 app shell | Restricts Carbon modal shells in favor of the O3 modal system; retains the base import guards |
 
 Each preset exports an array of flat-config objects, so spread it into your config.
 
@@ -72,6 +73,38 @@ The preset is also available from `@openmrs/eslint-config/react-types`. It is no
 There is no autofix: the rule matches the type's spelling, not the namespace it resolves to. For React types, replace `JSX.Element` with `React.JSX.Element` and add `import type React from 'react'` if needed. Review locally defined or imported JSX namespaces separately, and run type checking after making changes.
 
 If your repository already configures `@typescript-eslint/no-restricted-types`, preserve those restrictions when adding this one. ESLint replaces the rule's options rather than merging them.
+
+### Opt-in modal conventions
+
+Use the `modals` preset to require the [O3 modal system](https://o3-docs.openmrs.org/en-US/docs/modal-system/) for new modals. Register the modal in `routes.json`, export its lifecycle from `index.ts`, and launch it with `showModal()`. The modal component uses `ModalHeader`, `ModalBody`, and `ModalFooter` inside a fragment.
+
+```js
+import openmrs, { modals } from '@openmrs/eslint-config';
+
+export default [
+  { ignores: ['dist/**'] },
+  ...openmrs,
+  ...modals,
+];
+```
+
+The preset is also available from `@openmrs/eslint-config/modals`. Apply it after the default or `base` preset: both configure `no-restricted-imports`, and ESLint replaces that rule's options rather than merging them. The modal preset includes the existing base import restrictions. If your repository adds its own restrictions, preserve those when composing the rule options too.
+
+The rule rejects `Modal` and `ComposedModal` value imports from `@carbon/react`, including aliases, re-exports, and direct `es`/`lib` component imports. It allows type-only imports and modal header/body/footer imports. Namespace imports such as `import * as Carbon` are also rejected, even if only `Carbon.Button` is used; use named imports instead. Dynamic imports and CommonJS calls are outside this rule's scope.
+
+Adopt this preset after reviewing existing modal usages. Migration is not automatic: separately mounted modals need parent context passed explicitly, and cancellation and in-flight operations need to preserve their behavior. The framework closes the top modal on Escape, so disabling a modal's close button alone does not prevent dismissal.
+
+For infrastructure that needs to own its modal lifecycle, use a narrow exception with a reason rather than disabling the rule for an entire package:
+
+```js
+import {
+  // eslint-disable-next-line no-restricted-imports -- Legacy workspace infrastructure owns this modal's lifecycle.
+  ComposedModal,
+  ModalBody,
+} from '@carbon/react';
+```
+
+Standalone applications without the O3 app shell should not opt in. The default export does not include this preset, so installing an update does not introduce these restrictions until a repository enables them.
 
 ## Migrating from a legacy `.eslintrc`
 
