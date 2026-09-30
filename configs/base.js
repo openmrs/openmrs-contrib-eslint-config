@@ -62,6 +62,12 @@ export default tseslint.config(
               name: '@carbon/icons-react',
               message: "Import from `@carbon/react/icons`. e.g. `import { ChevronUp } from '@carbon/react/icons'`",
             },
+            {
+              name: 'swr',
+              importNames: ['mutate'],
+              message:
+                "Use `mutate` from `useSWRConfig()`. The global `mutate` targets SWR's default cache, which O3 components don't read from. e.g. `const { mutate } = useSWRConfig()`",
+            },
           ],
         },
       ],
