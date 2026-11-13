@@ -126,6 +126,27 @@ void mockUseConfig;
   assert.equal(ids.length, 2, `expected two no-restricted-imports errors, got: ${JSON.stringify(messages)}`);
 }
 
+// Base preset: the swr global `mutate` guard fires, including aliased imports,
+// while `useSWR`, `useSWRConfig`, and type imports from `swr` stay allowed.
+{
+  const flagged = await lint(
+    `import useSWR, { mutate } from 'swr';\nimport { mutate as globalMutate } from 'swr';\n\nexport { useSWR, mutate, globalMutate };\n`,
+    'src/swr-global-mutate.ts',
+  );
+  const ids = ruleIds(flagged).filter((id) => id === 'no-restricted-imports');
+  assert.equal(ids.length, 2, `expected two no-restricted-imports errors, got: ${JSON.stringify(flagged)}`);
+
+  const allowed = await lint(
+    `import useSWR, { type Cache, useSWRConfig } from 'swr';\n\nexport function useThing(cache: Cache) {\n  const { mutate } = useSWRConfig();\n  return { data: useSWR('/key').data, cache, mutate };\n}\n`,
+    'src/swr-scoped-mutate.ts',
+  );
+  assert.deepEqual(
+    ruleIds(allowed).filter((id) => id === 'no-restricted-imports'),
+    [],
+    `expected no no-restricted-imports errors, got: ${JSON.stringify(allowed)}`,
+  );
+}
+
 // Contract: require() is rejected in source files (TS and JS alike). The
 // toolsmith path guards against the tools/ glob matching by substring.
 for (const filePath of ['src/uses-require.ts', 'src/uses-require.js', 'src/toolsmith/uses-require.js']) {
